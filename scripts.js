@@ -263,7 +263,7 @@ console.log(product)
 }
 
 /**
- * Birta lista af vörum í console.
+ * Birta lista af vörum í console
  * @example
  * ```text
  * #1 HTML húfa — Húfa sem heldur hausnum heitum og hvíslar hugsanlega að þér hvaða element væri best að nota. — 5.000 kr.
