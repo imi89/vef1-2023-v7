@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Verkefnalýsing fyrir verkefni 7 með mörgum athugasemdum, sjá einnig yfirferð í fyrirlestri 9.
  * Sjá `scripts-plain.js` fyrir lausn án athugasemda.
@@ -177,6 +178,8 @@ function formatProduct(product, quantity = undefined) {
  * @returns Streng sem inniheldur upplýsingar um körfu.
  */
 function cartInfo(cart) {
+  const product = [];
+  const cart = [];
   /* Útfæra */
 }
 
@@ -192,7 +195,8 @@ function cartInfo(cart) {
  * Annars er ný vara búin til og upplýsingar um hana birtar í console.
  * @returns undefined
  */
-function addProduct() {
+function addProduct(id,title,price) {
+  products.push({id,title,price});
   // Til einföldunar gerum við ekki greinarmun á „Cancel“ og „Escape“ og tómum gildum frá notanda.
 
   // Förum í gegnum hvort og eitt gildi sem við viljum og pössum að við höfum eitthvað gildi.
@@ -271,9 +275,18 @@ console.log(product)
  * @returns undefined
  */
 function showProducts() {
+  if (products.length === 0) {
+    console.log('Engar vörur eru í boði.');
+  } else {
+    products.forEach(p => {
+      console.log(`#${p.id} ${p.title} — ${p.description} — ${formatPrice(p.price)}`);
+    });
+  }
+}
+
   /* Útfæra */
   /* Hér ætti að nota `formatPrice` hjálparfall */
-}
+
 
 /**
  * Bæta vöru við körfu.
@@ -291,12 +304,43 @@ function showProducts() {
  * @returns undefined
  */
 function addProductToCart() {
+  const productIdAsString = prompt('Auðkenni vöru sem á að bæta við körfu:');
+  const productId = Number.parseInt(productIdAsString, 10);
+
+  if (!validateInteger(productId, 1)) {
+    console.error('Auðkenni vöru er ekki löglegt, verður að vera heiltala stærri en 0.');
+    return;
+  }
+
+  const product = products.find(p => p.id === productId);
+
+  if (!product) {
+    console.error('Vara fannst ekki.');
+    return;
+  }
+
+  const quantityAsString = prompt('Fjöldi vöru sem á að bæta við körfu:');
+  const quantity = Number.parseInt(quantityAsString, 10);
+
+  if (!validateInteger(quantity, 1, 99)) {
+    console.error('Fjöldi er ekki löglegur, lágmark 1 og hámark 99.');
+    return;
+  }
+
+  let productInCart = cart.find(p => p.product.id === productId);
+  if (productInCart) {
+    productInCart.quantity += quantity;
+  } else {
+    cart.push({ product, quantity });
+  }
+}
+
   /* Útfæra */
 
   /* Hér ætti að nota `validateInteger` hjálparfall til að staðfesta gögn frá notanda */
   
   /* Til að athuga hvort vara sé til í `cart` þarf að nota `cart.lines.find` */
-}
+
 
 /**
  * Birta upplýsingar um körfu í console. Ef ekkert er í körfu er „Karfan er tóm.“ birt, annars
@@ -311,7 +355,19 @@ function addProductToCart() {
  * @returns undefined
  */
 function showCart() {
-  /* Útfæra */
+  
+
+  if (cart.length === 0) {
+    console.log('Karfan er tóm.');
+  } else {
+    let total = 0;
+    cart.forEach(item => {
+      const lineTotal = item.product.price * item.quantity;
+      total += lineTotal;
+      console.log(`${item.product.title} — ${item.quantity}x${formatPrice(item.product.price)} samtals ${formatPrice(lineTotal)}`);
+    });
+    console.log(`Samtals: ${formatPrice(total)}`);
+  }
 }
 
 /**
@@ -333,5 +389,31 @@ function showCart() {
  * @returns undefined
  */
 function checkout() {
-  /* Útfæra */
-}
+  
+    if (cart.length === 0) {
+      console.log('Karfan er tóm.');
+      return;
+    }
+  
+    const name = prompt('Nafn:');
+    if (!name) {
+      console.error('Þú verður að gefa upp nafn.');
+      return;
+    }
+  
+    const address = prompt('Heimilisfang:');
+    if (!address) {
+      console.error('Þú verður að gefa upp heimilisfang.');
+      return;
+    }
+  
+    console.log(`Pöntun móttekin ${name}.`);
+    console.log(`Vörur verða sendar á ${address}.`);
+    console.log('');
+    showCart();
+  
+    // Tæmum körfuna
+    cart.length = 0;
+  }
+  
+
